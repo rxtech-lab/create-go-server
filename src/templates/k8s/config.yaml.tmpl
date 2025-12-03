@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ projectName }}-config
+  namespace: {{ projectName }}
+data:
+  config.yaml: |
+    # Add your application configuration here
+    app:
+      name: {{ projectName }}
+      environment: production

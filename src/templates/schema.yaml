@@ -1,0 +1,62 @@
+"$schema": http://json-schema.org/draft-07/schema#
+type: object
+title: Go Server Configuration
+description: Create a Go web server
+required:
+  - githubRepository
+  - projectName
+properties:
+  githubRepository:
+    type: string
+    title: GitHub Repository
+    description: GitHub repository URL (e.g. github.com/rxtech-lab/create-go-server). This url will also be used for go.mod file.
+    pattern: "^github.com/[a-zA-Z0-9-_./]+$"
+    minLength: 1
+  projectName:
+    type: string
+    title: Package Name
+    description: Name of the Go module for your server (as used in go.mod)
+    pattern: "^[a-zA-Z0-9-_./]+$"
+    minLength: 1
+  dockerRepository:
+    type: string
+    title: Docker Repository
+    description: Docker repository to use for the project
+    pattern: "^[a-zA-Z0-9-_./]+$"
+    minLength: 1
+  backendFramework:
+    type: string
+    title: Backend Framework
+    description: Backend framework to use for the project
+    oneOf:
+      - title: Fiber
+        const: fiber
+  ormFramework:
+    type: string
+    title: ORM Framework
+    description: ORM framework to use for the project
+    oneOf:
+      - title: Gorm
+        const: gorm
+  databaseFramework:
+    type: string
+    title: Database Framework
+    description: Database framework to use for the project
+    oneOf:
+      - title: Postgres
+        const: postgres
+  useStrictServer:
+    type: boolean
+    title: Use Strict Server
+    description: Use a strict server implementation
+    default: yes
+  useKubernetes:
+    type: boolean
+    title: Include Kubernetes Files
+    description: Include Kubernetes files in the project
+    default: yes
+  useCI:
+    type: boolean
+    title: Include CI Files
+    description: Include CI files in the project
+    default: yes

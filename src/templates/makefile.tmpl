@@ -1,0 +1,32 @@
+.PHONY: install build test generate run docker clean
+
+install:
+	go get -tool github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen@latest
+	go install github.com/google/wire/cmd/wire@latest
+
+build:
+	go build -o bin/server cmd/server/main.go
+
+test:
+	go test ./...
+
+generate:
+	go generate ./...
+
+run:
+	go run cmd/server/main.go
+
+{% if dockerRepository %}
+docker:
+	docker build -t {{ dockerRepository }}:latest .
+	docker tag {{ dockerRepository }}:latest {{ dockerRepository }}:$$(git describe --tags --always 2>/dev/null || echo "dev")
+{% endif %}
+
+{% if useKubernetes %}
+deploy:
+	kubectl apply -k k8s/
+{% endif %}
+
+clean:
+	rm -rf bin/
+	rm -f internal/api/gen.go

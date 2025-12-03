@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ projectName }}
+  namespace: {{ projectName }}
+  labels:
+    app: {{ projectName }}
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: {{ projectName }}
+  template:
+    metadata:
+      labels:
+        app: {{ projectName }}
+    spec:
+      volumes:
+        - name: config
+          configMap:
+            name: {{ projectName }}-config
+      containers:
+        - name: {{ projectName }}
+          image: {{ dockerRepository }}:latest
+          resources:
+            limits:
+              memory: "256Mi"
+              cpu: "500m"
+            requests:
+              memory: "128Mi"
+              cpu: "250m"
+          envFrom:
+            - secretRef:
+                name: {{ projectName }}-secret
+          volumeMounts:
+            - name: config
+              mountPath: /app/config.yaml
+              subPath: config.yaml
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 10
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ projectName }}
+  namespace: {{ projectName }}
+  labels:
+    app: {{ projectName }}
+spec:
+  selector:
+    app: {{ projectName }}
+  ports:
+    - name: api
+      port: 8080
+      targetPort: 8080
+  type: ClusterIP

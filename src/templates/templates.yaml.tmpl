@@ -1,0 +1,96 @@
+files:
+  # Root files
+  - path: gitignore.tmpl
+    output: .gitignore
+
+  - path: go.mod.tmpl
+    output: go.mod
+    hooks:
+      afterAllEmit:
+        type: shell
+        command: go mod download && go get github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen && make generate && go mod tidy
+
+  - path: makefile.tmpl
+    output: Makefile
+
+  - path: docker-compose.yaml.tmpl
+    output: docker-compose.yaml
+
+  # API spec and config
+  - path: apispec.yaml.tmpl
+    output: api/openapi.yaml
+
+  - path: config.yaml.tmpl
+    output: tools/config.yaml
+
+  - path: tools.go.tmpl
+    output: tools/tools.go
+
+  # Application code
+  - path: main.go.tmpl
+    output: cmd/server/main.go
+
+  - path: config.go.tmpl
+    output: internal/config/config.go
+
+  - path: database.go.tmpl
+    output: internal/database/database.go
+
+  - path: models.go.tmpl
+    output: internal/models/models.go
+
+  - path: server.go.tmpl
+    output: internal/server/server.go
+
+  - path: wire.go.tmpl
+    output: internal/server/wire.go
+
+  - path: server_test.go.tmpl
+    output: internal/server/server_test.go
+
+  - path: service.go.tmpl
+    output: internal/service/service.go
+
+  - path: dto.go.tmpl
+    output: internal/dto/dto.go
+
+  - path: utils.go.tmpl
+    output: internal/utils/utils.go
+
+  # Testing
+  - path: testdb.go.tmpl
+    output: internal/testutil/testdb.go
+
+{% if useKubernetes %}
+  # Kubernetes manifests
+  - path: k8s/deployment.yaml.tmpl
+    output: k8s/deployment.yaml
+
+  - path: k8s/config.yaml.tmpl
+    output: k8s/config.yaml
+
+  - path: k8s/hpa.yaml.tmpl
+    output: k8s/hpa.yaml
+
+  - path: k8s/ingress.yaml.tmpl
+    output: k8s/ingress.yaml
+
+  - path: k8s/issuer.yaml.tmpl
+    output: k8s/issuer.yaml
+
+  - path: k8s/kustomization.yaml.tmpl
+    output: k8s/kustomization.yaml
+
+  - path: k8s/secrets.yaml.tmpl
+    output: k8s/secrets.yaml
+{% endif %}
+
+{% if useCI %}
+  # GitHub Workflows
+  - path: workflows/go-ci.yml.tmpl
+    output: .github/workflows/go-ci.yml
+
+  - path: workflows/create-release.yaml.tmpl
+    output: .github/workflows/create-release.yaml
+{% endif %}
+

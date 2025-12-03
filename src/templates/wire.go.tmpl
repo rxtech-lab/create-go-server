@@ -1,0 +1,20 @@
+//go:build wireinject
+// +build wireinject
+
+package server
+
+import (
+	"{{ githubRepository }}/internal/api"
+	"{{ githubRepository }}/internal/service"
+	"github.com/google/wire"
+	"gorm.io/gorm"
+)
+
+// InitializeServer creates a new server with all dependencies injected
+func InitializeServer(db *gorm.DB) (api.StrictServerInterface, error) {
+	wire.Build(
+		service.NewExampleService,
+		NewServer,
+	)
+	return nil, nil
+}
