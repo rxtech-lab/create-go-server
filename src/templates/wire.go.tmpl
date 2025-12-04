@@ -15,6 +15,7 @@ func InitializeServer(db *gorm.DB) (api.StrictServerInterface, error) {
 	wire.Build(
 		service.NewExampleService,
 		NewServer,
+		wire.Bind(new(api.StrictServerInterface), new(*Server)),
 	)
 	return nil, nil
 }

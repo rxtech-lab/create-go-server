@@ -3,12 +3,18 @@ files:
   - path: gitignore.tmpl
     output: .gitignore
 
+  - path: readme.md.tmpl
+    output: README.md
+
+  - path: env.example.tmpl
+    output: .env.example
+
   - path: go.mod.tmpl
     output: go.mod
     hooks:
       afterAllEmit:
         type: shell
-        command: go mod download && go get github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen && make generate && go mod tidy
+        command: make generate
 
   - path: makefile.tmpl
     output: Makefile

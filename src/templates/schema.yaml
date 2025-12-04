@@ -12,18 +12,21 @@ properties:
     description: GitHub repository URL (e.g. github.com/rxtech-lab/create-go-server). This url will also be used for go.mod file.
     pattern: "^github.com/[a-zA-Z0-9-_./]+$"
     minLength: 1
+    default: github.com/rxtech-lab/create-go-server
   projectName:
     type: string
     title: Package Name
     description: Name of the Go module for your server (as used in go.mod)
     pattern: "^[a-zA-Z0-9-_./]+$"
     minLength: 1
+    default: go-server
   dockerRepository:
     type: string
     title: Docker Repository
     description: Docker repository to use for the project
     pattern: "^[a-zA-Z0-9-_./]+$"
     minLength: 1
+    default: go-server
   backendFramework:
     type: string
     title: Backend Framework

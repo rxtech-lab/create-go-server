@@ -11,7 +11,11 @@ test:
 	go test ./...
 
 generate:
-	go generate ./...
+	go get github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen
+	go get github.com/google/wire/cmd/wire
+	go generate ./tools/...
+	go mod tidy
+	go tool github.com/google/wire/cmd/wire ./internal/server
 
 run:
 	go run cmd/server/main.go

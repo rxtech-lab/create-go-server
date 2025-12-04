@@ -1,0 +1,135 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+      
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'pnpm'
+      
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      
+      - name: Run tests
+        run: pnpm test
+      
+      - name: Build package
+        run: pnpm build
+      
+      - name: Verify build output
+        run: |
+          if [ ! -f dist/main.cjs ]; then
+            echo "Build failed: dist/main.cjs not found"
+            exit 1
+          fi
+          echo "Build successful"
+
+  test-generation:
+    runs-on: ubuntu-latest
+    needs: build-and-test
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: 'pnpm'
+      
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.23'
+          cache: false
+      
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      
+      - name: Build package
+        run: pnpm build
+      
+      - name: Generate test project
+        run: ./dist/main.cjs -y
+      
+      - name: Verify generated files
+        run: |
+          cd go-server
+          if [ ! -f go.mod ]; then
+            echo "Generation failed: go.mod not found"
+            exit 1
+          fi
+          if [ ! -f README.md ]; then
+            echo "Generation failed: README.md not found"
+            exit 1
+          fi
+          if [ ! -f .env.example ]; then
+            echo "Generation failed: .env.example not found"
+            exit 1
+          fi
+          echo "All expected files generated"
+      
+      - name: Build generated Go server
+        run: |
+          cd go-server
+          go build -o bin/server cmd/server/main.go
+          if [ ! -f bin/server ]; then
+            echo "Go build failed: bin/server not found"
+            exit 1
+          fi
+          echo "Go server built successfully"
+      
+      - name: Run Go tests
+        run: |
+          cd go-server
+          go test ./...
+
+  lint:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+          cache: 'pnpm'
+      
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      
+      - name: Check TypeScript
+        run: pnpm exec tsc --noEmit
+
