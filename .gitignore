@@ -3,3 +3,5 @@ coverage
 node_modules
 abc
 go-server
+.DS_Store
+!pnpm-lock.yaml

@@ -2,6 +2,7 @@
   "name": "create-go-server",
   "version": "1.0.0",
   "type": "module",
+  "packageManager": "pnpm@10.0.0",
   "bin": {
     "create-go-server": "./dist/main.cjs"
   },
